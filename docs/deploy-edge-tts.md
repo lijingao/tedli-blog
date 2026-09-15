@@ -100,7 +100,7 @@ curl https://tts.tsh520.cn/health
 |------|------|
 | 库版本旧 | `docker compose build --no-cache`（requirements 要求 ≥7.2.7） |
 | 服务器时间不准（令牌对时钟敏感） | `timedatectl set-ntp true && systemctl restart systemd-timesyncd` |
-| 机房 IP 被区域风控 | 编辑 `docker-compose.yml` 的 `EDGE_TTS_PROXY=` 填入代理地址（如 `http://127.0.0.1:7890`）后执行 `docker compose up -d`（直接 export 环境变量不生效：compose 里的显式空值优先） |
+| 机房 IP 被区域风控 | 编辑 `docker-compose.yml` 的 `EDGE_TTS_PROXY=` 填入代理地址后执行 `docker compose up -d`（直接 export 不生效：compose 里的字面空值优先）。注意容器内 `127.0.0.1` 是容器自身，代理跑在宿主机时要填宿主网关（Linux Docker 默认 `http://172.17.0.1:7890`；或在 compose 加 `extra_hosts: ["host.docker.internal:host-gateway"]` 后用 `http://host.docker.internal:7890`），且代理需监听 `0.0.0.0` |
 | 仍不行 | 不影响博客：前端自动降级系统语音；服务保留，等微软策略变化再试 |
 
 ## 九、常用运维

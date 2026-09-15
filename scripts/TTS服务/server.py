@@ -11,7 +11,7 @@
 - CACHE_DIR        音频缓存目录（默认 ./cache）
 - CACHE_MAX_MB     缓存上限 MB（默认 2048，超出按 mtime 淘汰）
 - ALLOWED_ORIGINS  允许的跨域来源，逗号分隔
-- EDGE_TTS_PROXY   调用微软语音服务的代理（可选，如 http://127.0.0.1:7890）
+- EDGE_TTS_PROXY   调用微软语音服务的代理（可选，如 http://127.0.0.1:7890；容器内 127.0.0.1 指容器自身，代理跑在宿主机时需填宿主网关，如 http://172.17.0.1:7890）
 """
 
 import asyncio
@@ -127,7 +127,10 @@ def cleanup_cache() -> None:
         except OSError:
             continue
         total -= size
-        path.unlink(missing_ok=True)
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            continue
     cutoff = time.time() - 3600
     for path in CACHE_DIR.glob("*.part"):
         try:
@@ -179,7 +182,6 @@ async def create_tts(req: TTSRequest) -> dict[str, str]:
     ]
     for key in expired:
         _texts.pop(key, None)
-        _locks.pop(key, None)
     cid = make_id(req.text, req.voice)
     _texts[cid] = (req.text, req.voice, now)
     return {"id": cid}
@@ -202,8 +204,11 @@ async def get_audio(cid: str):
 
     async def stream():
         async with lock:
-            if path.exists():
+            try:
                 data = path.read_bytes()
+            except OSError:
+                data = b""
+            if data:
                 _texts.pop(cid, None)
                 _locks.pop(cid, None)
                 yield data
