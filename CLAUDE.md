@@ -323,7 +323,7 @@ Layout.astro          ← HTML 骨架：<html>, <head>, <body>, 全局组件, �
 
 ### 其他配置
 
-`adConfig`, `announcementConfig`, `circleConfig`, `coverImageConfig`, `expressiveCodeConfig`, `fontConfig`, `footerConfig`, `friendsConfig`, `guestbookConfig`, `licenseConfig`, `pioConfig`(Live2D/Spine), `relationshipConfig`, `sakuraConfig`, `securityConfig`, `skillsConfig`, `sponsorConfig`, `ttsConfig`(文章朗读)
+`adConfig`, `announcementConfig`, `circleConfig`, `coverImageConfig`, `expressiveCodeConfig`, `fontConfig`, `footerConfig`, `friendsConfig`, `guestbookConfig`, `licenseConfig`, `momentConfig`(动态评论配置), `pioConfig`(Live2D/Spine), `relationshipConfig`, `sakuraConfig`, `securityConfig`, `skillsConfig`, `sponsorConfig`, `ttsConfig`(文章朗读)
 
 ### 外部配置（直接导入，不经 barrel）
 
