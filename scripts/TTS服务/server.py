@@ -55,6 +55,7 @@ app.add_middleware(
 )
 
 _texts: dict[str, tuple[str, str, float]] = {}
+_locks: dict[str, asyncio.Lock] = {}
 _semaphore = asyncio.Semaphore(MAX_CONCURRENT_SYNTH)
 _voices_cache: tuple[float, list[dict[str, str]]] | None = None
 
@@ -104,14 +105,36 @@ def split_text(text: str, limit: int = CHUNK_CHARS) -> list[str]:
 
 
 def cleanup_cache() -> None:
-    files = sorted(CACHE_DIR.glob("*.mp3"), key=lambda p: p.stat().st_mtime)
-    total = sum(p.stat().st_size for p in files)
+    try:
+        files = sorted(
+            (path for path in CACHE_DIR.glob("*.mp3") if path.is_file()),
+            key=lambda path: path.stat().st_mtime,
+        )
+    except OSError:
+        return
+    total = 0
+    for path in files:
+        try:
+            total += path.stat().st_size
+        except OSError:
+            continue
     limit = CACHE_MAX_MB * 1024 * 1024
     for path in files:
         if total <= limit:
             break
-        total -= path.stat().st_size
+        try:
+            size = path.stat().st_size
+        except OSError:
+            continue
+        total -= size
         path.unlink(missing_ok=True)
+    cutoff = time.time() - 3600
+    for path in CACHE_DIR.glob("*.part"):
+        try:
+            if path.stat().st_mtime < cutoff:
+                path.unlink(missing_ok=True)
+        except OSError:
+            continue
 
 
 async def synth(text: str, voice: str):
@@ -150,8 +173,15 @@ async def voices() -> dict[str, list[dict[str, str]]]:
 
 @app.post("/tts")
 async def create_tts(req: TTSRequest) -> dict[str, str]:
+    now = time.time()
+    expired = [
+        key for key, value in _texts.items() if now - value[2] > TEXT_TTL_SECONDS
+    ]
+    for key in expired:
+        _texts.pop(key, None)
+        _locks.pop(key, None)
     cid = make_id(req.text, req.voice)
-    _texts[cid] = (req.text, req.voice, time.time())
+    _texts[cid] = (req.text, req.voice, now)
     return {"id": cid}
 
 
@@ -168,19 +198,29 @@ async def get_audio(cid: str):
         raise HTTPException(status_code=404, detail="id 不存在或已过期，请重新发起朗读")
     text, voice, _ = entry
 
+    lock = _locks.setdefault(cid, asyncio.Lock())
+
     async def stream():
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(".part")
-        try:
-            with open(tmp, "wb") as handle:
-                async for data in synth(text, voice):
-                    handle.write(data)
-                    yield data
-            os.replace(tmp, path)
-            _texts.pop(cid, None)
-            cleanup_cache()
-        except (Exception, asyncio.CancelledError):
-            tmp.unlink(missing_ok=True)
-            raise
+        async with lock:
+            if path.exists():
+                data = path.read_bytes()
+                _texts.pop(cid, None)
+                _locks.pop(cid, None)
+                yield data
+                return
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".part")
+            try:
+                with open(tmp, "wb") as handle:
+                    async for data in synth(text, voice):
+                        handle.write(data)
+                        yield data
+                os.replace(tmp, path)
+                _texts.pop(cid, None)
+                _locks.pop(cid, None)
+                await asyncio.to_thread(cleanup_cache)
+            except (Exception, asyncio.CancelledError):
+                tmp.unlink(missing_ok=True)
+                raise
 
     return StreamingResponse(stream(), media_type="audio/mpeg")
