@@ -34,7 +34,7 @@ cp -r "/tmp/blog/scripts/TTS服务/." /opt/blog-tts/
 ```bash
 cd /opt/blog-tts
 docker run --rm python:3.12 bash -c \
-  "pip install --quiet edge-tts && edge-tts --list-voices | head -n 5"
+  "pip install --quiet edge-tts && edge-tts --list-voices > /tmp/voices.txt && head -n 5 /tmp/voices.txt"
 ```
 
 - 能列出音色（如 `zh-CN-XiaoxiaoNeural`）→ 继续下一步
@@ -100,7 +100,7 @@ curl https://tts.tsh520.cn/health
 |------|------|
 | 库版本旧 | `docker compose build --no-cache`（requirements 要求 ≥7.2.7） |
 | 服务器时间不准（令牌对时钟敏感） | `timedatectl set-ntp true && systemctl restart systemd-timesyncd` |
-| 机房 IP 被区域风控 | compose 设 `EDGE_TTS_PROXY=http://代理:端口` 后 `docker compose up -d` |
+| 机房 IP 被区域风控 | 编辑 `docker-compose.yml` 的 `EDGE_TTS_PROXY=` 填入代理地址（如 `http://127.0.0.1:7890`）后执行 `docker compose up -d`（直接 export 环境变量不生效：compose 里的显式空值优先） |
 | 仍不行 | 不影响博客：前端自动降级系统语音；服务保留，等微软策略变化再试 |
 
 ## 九、常用运维
