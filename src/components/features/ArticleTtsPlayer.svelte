@@ -28,16 +28,18 @@ let text = "";
 let speechQueue: string[] = [];
 let speechIndex = 0;
 let speechEpoch = 0;
+let requestSeq = 0;
+let activeController: AbortController | null = null;
 let noticeTimer: ReturnType<typeof setTimeout> | null = null;
 
 const hasServer = ttsConfig.enable && ttsConfig.serverUrl.length > 0;
 
 onMount(() => {
-	const savedRate = Number(localStorage.getItem("firefly-tts-rate") || "1");
+	const savedRate = Number(safeGetStorage("firefly-tts-rate") || "1");
 	if (ttsConfig.speeds.includes(savedRate)) {
 		rate = savedRate;
 	}
-	const savedVoice = localStorage.getItem("firefly-tts-voice");
+	const savedVoice = safeGetStorage("firefly-tts-voice");
 	if (savedVoice && ttsConfig.voices.some((item) => item.name === savedVoice)) {
 		voice = savedVoice;
 	}
@@ -47,6 +49,22 @@ onDestroy(() => {
 	stopAll();
 	if (noticeTimer) clearTimeout(noticeTimer);
 });
+
+function safeGetStorage(key: string): string | null {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+}
+
+function safeSetStorage(key: string, value: string): void {
+	try {
+		localStorage.setItem(key, value);
+	} catch {
+		// 隐私模式/受限环境：忽略即可
+	}
+}
 
 function showNotice(message: string): void {
 	if (!message) return;
@@ -74,6 +92,19 @@ function collectText(): string {
 function cancelSpeech(): void {
 	speechEpoch += 1;
 	window.speechSynthesis.cancel();
+	window.speechSynthesis.resume();
+}
+
+function abortServerRequest(): void {
+	if (activeController) {
+		activeController.abort();
+		activeController = null;
+	}
+}
+
+function invalidateRequest(): void {
+	requestSeq += 1;
+	abortServerRequest();
 }
 
 function releaseAudio(): void {
@@ -90,6 +121,8 @@ function releaseAudio(): void {
 function stopAll(): void {
 	releaseAudio();
 	cancelSpeech();
+	invalidateRequest();
+	clearMediaSession();
 	playing = false;
 	loading = false;
 	elapsed = 0;
@@ -106,14 +139,27 @@ function setupMediaSession(): void {
 	});
 	navigator.mediaSession.setActionHandler("play", () => {
 		if (mode === "server" && audio) {
-			void audio.play();
-			playing = true;
+			audio
+				.play()
+				.then(() => {
+					playing = true;
+				})
+				.catch(() => {
+					playing = false;
+				});
 		}
 	});
 	navigator.mediaSession.setActionHandler("pause", () => {
 		audio?.pause();
 		playing = false;
 	});
+}
+
+function clearMediaSession(): void {
+	if (!("mediaSession" in navigator)) return;
+	navigator.mediaSession.metadata = null;
+	navigator.mediaSession.setActionHandler("play", null);
+	navigator.mediaSession.setActionHandler("pause", null);
 }
 
 function speakNext(epoch: number): void {
@@ -138,6 +184,7 @@ function speakNext(epoch: number): void {
 
 function startSpeech(message: string): void {
 	if (message) showNotice(message);
+	abortServerRequest();
 	mode = "speech";
 	cancelSpeech();
 	speechQueue = splitForSpeech(text);
@@ -152,10 +199,13 @@ function startSpeech(message: string): void {
 async function startServer(): Promise<void> {
 	releaseAudio();
 	cancelSpeech();
+	invalidateRequest();
 	mode = "server";
 	loading = true;
 	notice = "";
+	const seq = requestSeq;
 	const controller = new AbortController();
+	activeController = controller;
 	const timeout = setTimeout(
 		() => controller.abort(),
 		ttsConfig.requestTimeoutMs,
@@ -171,6 +221,9 @@ async function startServer(): Promise<void> {
 			throw new Error(`HTTP ${response.status}`);
 		}
 		const data = (await response.json()) as { id: string };
+		if (seq !== requestSeq || !open) {
+			return;
+		}
 		const player = new Audio(`${ttsConfig.serverUrl}/audio/${data.id}`);
 		player.playbackRate = rate;
 		player.ontimeupdate = () => {
@@ -182,9 +235,11 @@ async function startServer(): Promise<void> {
 			elapsed = 0;
 		};
 		player.onerror = () => {
+			releaseAudio();
 			startSpeech(i18n(I18nKey.ttsFallback));
 		};
 		audio = player;
+		activeController = null;
 		setupMediaSession();
 		try {
 			await player.play();
@@ -193,10 +248,14 @@ async function startServer(): Promise<void> {
 			playing = false;
 		}
 	} catch {
-		startSpeech(i18n(I18nKey.ttsFallback));
+		if (seq === requestSeq && open) {
+			startSpeech(i18n(I18nKey.ttsFallback));
+		}
 	} finally {
 		clearTimeout(timeout);
-		loading = false;
+		if (seq === requestSeq) {
+			loading = false;
+		}
 	}
 }
 
@@ -205,7 +264,8 @@ async function start(): Promise<void> {
 	open = true;
 	text = collectText();
 	if (!text) {
-		open = false;
+		loading = false;
+		open = true;
 		return;
 	}
 	if (hasServer) {
@@ -226,8 +286,14 @@ function toggle(): void {
 			audio.pause();
 			playing = false;
 		} else {
-			void audio.play();
-			playing = true;
+			audio
+				.play()
+				.then(() => {
+					playing = true;
+				})
+				.catch(() => {
+					playing = false;
+				});
 		}
 		return;
 	}
@@ -235,6 +301,9 @@ function toggle(): void {
 		if (playing) {
 			window.speechSynthesis.pause();
 			playing = false;
+		} else if (speechIndex >= speechQueue.length) {
+			speechIndex = 0;
+			speakNext(speechEpoch);
 		} else {
 			window.speechSynthesis.resume();
 			playing = true;
@@ -245,7 +314,7 @@ function toggle(): void {
 function changeRate(event: Event): void {
 	const value = Number((event.currentTarget as HTMLSelectElement).value);
 	rate = value;
-	localStorage.setItem("firefly-tts-rate", String(value));
+	safeSetStorage("firefly-tts-rate", String(value));
 	if (mode === "server" && audio) {
 		audio.playbackRate = value;
 		return;
@@ -258,7 +327,7 @@ function changeRate(event: Event): void {
 
 function changeVoice(event: Event): void {
 	voice = (event.currentTarget as HTMLSelectElement).value;
-	localStorage.setItem("firefly-tts-voice", voice);
+	safeSetStorage("firefly-tts-voice", voice);
 	if (mode === "server" && open) {
 		void startServer();
 	}
@@ -350,9 +419,9 @@ function close(): void {
 		</button>
 
 		{#if loading}
-			<span class="tts-player__notice">{i18n(I18nKey.ttsPreparing)}</span>
+			<span class="tts-player__notice" role="status" aria-live="polite">{i18n(I18nKey.ttsPreparing)}</span>
 		{:else if notice}
-			<span class="tts-player__notice">{notice}</span>
+			<span class="tts-player__notice" role="status" aria-live="polite">{notice}</span>
 		{/if}
 	</div>
 {/if}
