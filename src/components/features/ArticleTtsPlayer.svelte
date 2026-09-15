@@ -90,6 +90,7 @@ function collectText(): string {
 }
 
 function cancelSpeech(): void {
+	if (typeof window === "undefined") return;
 	speechEpoch += 1;
 	window.speechSynthesis.cancel();
 	window.speechSynthesis.resume();
@@ -130,7 +131,8 @@ function stopAll(): void {
 }
 
 function setupMediaSession(): void {
-	if (!("mediaSession" in navigator)) return;
+	if (typeof navigator === "undefined" || !("mediaSession" in navigator))
+		return;
 	navigator.mediaSession.metadata = new MediaMetadata({
 		title,
 		artist: siteConfig.title,
@@ -150,13 +152,15 @@ function setupMediaSession(): void {
 		}
 	});
 	navigator.mediaSession.setActionHandler("pause", () => {
-		audio?.pause();
+		if (mode !== "server" || !audio) return;
+		audio.pause();
 		playing = false;
 	});
 }
 
 function clearMediaSession(): void {
-	if (!("mediaSession" in navigator)) return;
+	if (typeof navigator === "undefined" || !("mediaSession" in navigator))
+		return;
 	navigator.mediaSession.metadata = null;
 	navigator.mediaSession.setActionHandler("play", null);
 	navigator.mediaSession.setActionHandler("pause", null);
@@ -183,8 +187,9 @@ function speakNext(epoch: number): void {
 }
 
 function startSpeech(message: string): void {
+	clearMediaSession();
 	if (message) showNotice(message);
-	abortServerRequest();
+	invalidateRequest();
 	mode = "speech";
 	cancelSpeech();
 	speechQueue = splitForSpeech(text);
@@ -295,6 +300,10 @@ function toggle(): void {
 					playing = false;
 				});
 		}
+		return;
+	}
+	if (mode === "server") {
+		void start();
 		return;
 	}
 	if (mode === "speech") {
