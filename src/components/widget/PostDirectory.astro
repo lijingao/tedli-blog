@@ -16,6 +16,7 @@ const { currentSlug = "", class: className, style } = Astro.props;
 	id="post-directory"
 	class={className}
 	style={style}
+	flat
 >
 	<PostDirectoryList currentSlug={currentSlug} />
 </WidgetLayout>
