@@ -377,6 +377,18 @@ enum I18nKey {
 
 	welcomeCardLearnMore = "welcomeCardLearnMore",
 	welcomeCardRecentLabel = "welcomeCardRecentLabel",
+
+	ttsRead = "ttsRead",
+	ttsPause = "ttsPause",
+	ttsResume = "ttsResume",
+	ttsClose = "ttsClose",
+	ttsSpeed = "ttsSpeed",
+	ttsVoice = "ttsVoice",
+	ttsPreparing = "ttsPreparing",
+	ttsEmpty = "ttsEmpty",
+	ttsFallback = "ttsFallback",
+	ttsNoServer = "ttsNoServer",
+	ttsTruncated = "ttsTruncated",
 }
 
 export default I18nKey;

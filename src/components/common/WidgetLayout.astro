@@ -10,11 +10,24 @@ interface Props {
 	collapsedHeight?: string;
 	class?: string;
 	style?: string;
+	flat?: boolean;
 }
-const { id, name, isCollapsed, collapsedHeight, style } = Astro.props;
+const {
+	id,
+	name,
+	isCollapsed,
+	collapsedHeight,
+	style,
+	flat = false,
+} = Astro.props;
 const className = Astro.props.class;
 ---
-<widget-layout data-id={id} data-is-collapsed={String(isCollapsed)} class={"section pt-3 " + className} style={style}>
+<widget-layout
+  data-id={id}
+  data-is-collapsed={String(isCollapsed)}
+  class:list={["section pt-3", flat && "widget-layout--flat", className]}
+  style={style}
+>
     {name && (
         <div class="widget-title font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
             before:w-1 before:h-4 before:rounded-md before:bg-(--primary)
@@ -62,6 +75,29 @@ const className = Astro.props.class;
     :root.dark widget-layout:hover {
         border-color: rgba(255, 255, 255, 0.15);
         box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    widget-layout.widget-layout--flat {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    :root.dark widget-layout.widget-layout--flat {
+        border-color: transparent;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    widget-layout.widget-layout--flat:hover {
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    :root.dark widget-layout.widget-layout--flat:hover {
+        border-color: transparent;
+        box-shadow: none;
     }
 
     .collapsed {

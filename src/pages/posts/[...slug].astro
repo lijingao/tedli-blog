@@ -18,9 +18,10 @@ import {
 import { Icon } from "astro-icon/components";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import ArticleTtsPlayer from "@/components/features/ArticleTtsPlayer.svelte";
 import PostBreadcrumb from "@/components/layout/PostBreadcrumb.astro";
 import SharePoster from "@/components/misc/SharePoster.svelte";
-import { commentConfig } from "@/config";
+import { commentConfig, ttsConfig } from "@/config";
 import { licenseConfig } from "@/config/licenseConfig";
 import { profileConfig } from "@/config/profileConfig";
 import { siteConfig } from "@/config/siteConfig";
@@ -220,6 +221,14 @@ const jsonLd = {
             url={Astro.url.href}
             siteTitle={siteConfig.title}
             avatar={posterAvatarUrl}
+          /></span>
+        )}
+
+        {ttsConfig.enable && (
+          <span class="post-hero__tts"><ArticleTtsPlayer
+            client:load
+            title={entry.data.title}
+            cover={posterCoverUrl}
           /></span>
         )}
     </div>

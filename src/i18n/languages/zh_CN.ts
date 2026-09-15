@@ -384,4 +384,16 @@ export const zh_CN: Translation = {
 
 	[Key.welcomeCardLearnMore]: "了解更多",
 	[Key.welcomeCardRecentLabel]: "最近更新",
+
+	[Key.ttsRead]: "朗读",
+	[Key.ttsPause]: "暂停",
+	[Key.ttsResume]: "继续",
+	[Key.ttsClose]: "关闭",
+	[Key.ttsSpeed]: "倍速",
+	[Key.ttsVoice]: "音色",
+	[Key.ttsPreparing]: "正在生成语音…",
+	[Key.ttsEmpty]: "没有可朗读的内容",
+	[Key.ttsFallback]: "朗读服务不可用，已切换系统语音",
+	[Key.ttsNoServer]: "未配置朗读服务，使用系统语音",
+	[Key.ttsTruncated]: "文章较长，已截断部分内容朗读",
 };
