@@ -3,7 +3,7 @@ title: Python3基础知识
 published: 2026-08-19
 tags:
   - py
-description: ""
+description: Python3 编码、标识符、关键字、注释、缩进和数据类型等基础语法
 ---
 ## 编码
 

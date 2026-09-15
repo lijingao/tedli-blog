@@ -3,7 +3,7 @@ title: Python3 注释
 published: 2026-09-14
 tags:
   - Python
-description: ""
+description: Python3 单行注释、多行注释和 Docstring 的使用方法
 ---
 Python 中，注释不会影响程序的执行，但是会使代码更易于阅读和理解。
 

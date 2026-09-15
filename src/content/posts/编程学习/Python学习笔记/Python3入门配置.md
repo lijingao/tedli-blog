@@ -3,7 +3,7 @@ title: Python3 简介
 published: 2026-08-18
 tags:
   - py
-description: ""
+description: Python3 语言简介、设计哲学和应用领域
 ---
 ## Python3.xPython3 简介
 

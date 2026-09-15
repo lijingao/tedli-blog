@@ -3,7 +3,7 @@ title: Python3 基本数据类型
 published: 2026-09-13
 tags:
   - python
-description: ""
+description: Python3 变量赋值、Number、String、bool、List、Tuple、Set、Dictionary 数据类型
 ---
 
 Python 中的变量不需要声明。每个变量在使用前都必须赋值，变量赋值以后该变量才会被创建。

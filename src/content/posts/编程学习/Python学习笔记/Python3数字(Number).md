@@ -3,7 +3,7 @@ title: Python3 数字(Number)
 published: 2026-09-14
 tags:
   - Python
-description: ""
+description: Python3 数字类型、数学函数、随机数函数和三角函数
 ---
 Python 数字数据类型用于存储数值。
 

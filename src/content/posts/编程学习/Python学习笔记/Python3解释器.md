@@ -3,7 +3,7 @@ title: Python3 解释器
 published: 2026-09-14
 tags:
   - py
-description: ""
+description: Python3 解释器的启动方式、交互式编程和脚本式编程
 ---
 Linux/Unix的系统上，一般默认的 python 版本为 2.x，我们可以将 python3.x 安装在 **/usr/local/python3** 目录中。
 

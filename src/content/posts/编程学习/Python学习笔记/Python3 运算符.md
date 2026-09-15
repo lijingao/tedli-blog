@@ -3,7 +3,7 @@ title: Python3 运算符
 published: 2026-09-14
 tags:
   - Python
-description: ""
+description: Python3 算术、比较、赋值、逻辑、成员、身份运算符及优先级
 ---
 ## 什么是运算符？
 

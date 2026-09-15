@@ -3,7 +3,7 @@ title: Python3 数据类型转换
 published: 2026-09-14
 tags:
   - py
-description: ""
+description: Python3 隐式类型转换和显式类型转换的方法
 ---
 有时候，我们需要对数据内置的类型进行转换，数据类型的转换，一般情况下你只需要将数据类型作为函数名即可。
 
