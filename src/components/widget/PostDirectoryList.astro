@@ -534,30 +534,29 @@ const { rows } = walk(root);
 
 		/**
 		 * 展开当前文章的祖先文件夹链
-		 * 逐级向上查找：先找直接父文件夹（depth = itemDepth - 1），
-		 * 再从父文件夹位置向上找祖父文件夹（depth = itemDepth - 2），以此类推
+		 * 先沿 DOM 向前收集祖先文件夹（由内到外），再从最外层到最内层依次展开：
+		 * 展开外层文件夹时会收起其内层后代，因此必须最后展开最内层，当前文章才不会再次被折叠
 		 */
 		function expandAncestors(item) {
 			var itemDepth = parseInt(item.getAttribute("data-depth")) || 0;
 			if (itemDepth <= 0) return;
+			var chain = [];
 			var targetDepth = itemDepth - 1;
 			var cursor = item.previousElementSibling;
 			while (cursor && targetDepth >= 0) {
 				if (cursor.classList.contains("pd-folder")) {
 					var d = parseInt(cursor.style.getPropertyValue("--depth")) || 0;
 					if (d < targetDepth) {
-						// 深度不够，说明这个层级没有文件夹，跳到更浅的层级
 						targetDepth = d - 1;
-						continue;
-					}
-					if (d === targetDepth) {
-						if (!cursor.classList.contains("expanded")) {
-							toggleFolder(cursor, true);
-						}
+					} else if (d === targetDepth) {
+						chain.push(cursor);
 						targetDepth--;
 					}
 				}
 				cursor = cursor.previousElementSibling;
+			}
+			for (var i = chain.length - 1; i >= 0; i--) {
+				toggleFolder(chain[i], true);
 			}
 		}
 
