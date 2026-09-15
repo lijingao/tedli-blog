@@ -388,6 +388,7 @@ enum I18nKey {
 	ttsEmpty = "ttsEmpty",
 	ttsFallback = "ttsFallback",
 	ttsNoServer = "ttsNoServer",
+	ttsTruncated = "ttsTruncated",
 }
 
 export default I18nKey;

@@ -83,9 +83,16 @@ function walk(element: Element, out: string[]): void {
 	}
 }
 
-export function extractReadableText(root: ParentNode | null): string {
+export interface ExtractedReadableText {
+	text: string;
+	truncated: boolean;
+}
+
+export function extractReadableText(
+	root: ParentNode | null,
+): ExtractedReadableText {
 	if (!(root instanceof Element)) {
-		return "";
+		return { text: "", truncated: false };
 	}
 	const clone = root.cloneNode(true) as Element;
 	for (const selector of SKIP_SELECTORS) {
@@ -95,11 +102,15 @@ export function extractReadableText(root: ParentNode | null): string {
 	}
 	const blocks: string[] = [];
 	walk(clone, blocks);
-	return blocks.join("\n").slice(0, ttsConfig.maxChars);
+	const full = blocks.join("\n");
+	return {
+		text: full.slice(0, ttsConfig.maxChars),
+		truncated: full.length > ttsConfig.maxChars,
+	};
 }
 
 export function splitForSpeech(text: string): string[] {
-	const limit = ttsConfig.speechChunkChars;
+	const limit = Math.max(1, ttsConfig.speechChunkChars);
 	const sentences = text.split(/(?<=[。！？!?；;，,\n])/);
 	const chunks: string[] = [];
 	let current = "";

@@ -14,9 +14,11 @@ export interface TtsConfig {
 	speechChunkChars: number;
 }
 
+const rawServerUrl = import.meta.env.PUBLIC_TTS_SERVER || "";
+
 export const ttsConfig: TtsConfig = {
 	enable: true,
-	serverUrl: import.meta.env.PUBLIC_TTS_SERVER || "",
+	serverUrl: rawServerUrl.replace(/\/+$/, ""),
 	defaultVoice: "zh-CN-XiaoxiaoNeural",
 	voices: [
 		{ name: "zh-CN-XiaoxiaoNeural", label: "晓晓（女声）" },

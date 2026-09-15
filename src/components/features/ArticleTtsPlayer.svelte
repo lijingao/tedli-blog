@@ -90,9 +90,13 @@ function formatTime(value: number): string {
 
 function collectText(): string {
 	const root = document.querySelector("#post-container .markdown-content");
-	const value = extractReadableText(root);
-	if (!value) showNotice(i18n(I18nKey.ttsEmpty));
-	return value;
+	const result = extractReadableText(root);
+	if (!result.text) {
+		showNotice(i18n(I18nKey.ttsEmpty));
+	} else if (result.truncated) {
+		showNotice(i18n(I18nKey.ttsTruncated));
+	}
+	return result.text;
 }
 
 function cancelSpeech(): void {
@@ -233,7 +237,6 @@ async function startServer(): Promise<void> {
 	invalidateRequest();
 	mode = "server";
 	loading = true;
-	notice = "";
 	const seq = requestSeq;
 	const controller = new AbortController();
 	activeController = controller;
@@ -354,8 +357,10 @@ function changeRate(event: Event): void {
 		return;
 	}
 	if (mode === "speech") {
-		cancelSpeech();
-		speakNext(speechEpoch);
+		if (playing) {
+			cancelSpeech();
+			speakNext(speechEpoch);
+		}
 	}
 }
 
@@ -403,7 +408,11 @@ function close(): void {
 			onclick={toggle}
 			aria-label={playing ? i18n(I18nKey.ttsPause) : i18n(I18nKey.ttsResume)}
 		>
-			<Icon icon={playing ? "material-symbols:pause" : "material-symbols:play-arrow"} />
+			{#if playing}
+				<Icon icon="material-symbols:pause-rounded" />
+			{:else}
+				<Icon icon="material-symbols:play-arrow-rounded" />
+			{/if}
 		</button>
 
 		<div class="tts-player__timeline">

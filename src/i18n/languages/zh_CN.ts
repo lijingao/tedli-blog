@@ -395,4 +395,5 @@ export const zh_CN: Translation = {
 	[Key.ttsEmpty]: "没有可朗读的内容",
 	[Key.ttsFallback]: "朗读服务不可用，已切换系统语音",
 	[Key.ttsNoServer]: "未配置朗读服务，使用系统语音",
+	[Key.ttsTruncated]: "文章较长，已截断部分内容朗读",
 };

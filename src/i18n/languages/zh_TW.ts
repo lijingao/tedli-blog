@@ -396,4 +396,5 @@ export const zh_TW: Translation = {
 	[Key.ttsEmpty]: "沒有可朗讀的內容",
 	[Key.ttsFallback]: "朗讀服務無法使用，已切換系統語音",
 	[Key.ttsNoServer]: "未設定朗讀服務，使用系統語音",
+	[Key.ttsTruncated]: "文章較長，已截斷部分內容朗讀",
 };

@@ -404,4 +404,5 @@ export const en: Translation = {
 	[Key.ttsEmpty]: "Nothing to read",
 	[Key.ttsFallback]: "Reading service unavailable, switched to system voice",
 	[Key.ttsNoServer]: "Reading service not configured, using system voice",
+	[Key.ttsTruncated]: "Article is long; reading was truncated",
 };
