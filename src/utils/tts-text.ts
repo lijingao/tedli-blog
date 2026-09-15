@@ -62,11 +62,21 @@ function walk(element: Element, out: string[]): void {
 		}
 		return;
 	}
-	for (const child of children) {
-		if (child.tagName === "BR") {
+	for (const node of Array.from(element.childNodes)) {
+		if (node.nodeType === Node.TEXT_NODE) {
+			const text = cleanText(node.textContent ?? "");
+			if (text) {
+				out.push(text);
+			}
 			continue;
 		}
-		walk(child, out);
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			const child = node as Element;
+			if (child.tagName === "BR") {
+				continue;
+			}
+			walk(child, out);
+		}
 	}
 }
 
