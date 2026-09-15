@@ -392,4 +392,16 @@ export const ja: Translation = {
 
 	[Key.welcomeCardLearnMore]: "詳しく見る",
 	[Key.welcomeCardRecentLabel]: "最近の更新",
+
+	[Key.ttsRead]: "読み上げ",
+	[Key.ttsPause]: "一時停止",
+	[Key.ttsResume]: "再開",
+	[Key.ttsClose]: "閉じる",
+	[Key.ttsSpeed]: "速度",
+	[Key.ttsVoice]: "音声",
+	[Key.ttsPreparing]: "音声を生成中…",
+	[Key.ttsEmpty]: "読み上げ可能な内容がありません",
+	[Key.ttsFallback]:
+		"読み上げサービスが利用できないため、システム音声に切り替えました",
+	[Key.ttsNoServer]: "読み上げサービス未設定、システム音声を使用します",
 };

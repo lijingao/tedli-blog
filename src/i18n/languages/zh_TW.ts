@@ -385,4 +385,15 @@ export const zh_TW: Translation = {
 
 	[Key.welcomeCardLearnMore]: "了解更多",
 	[Key.welcomeCardRecentLabel]: "最近更新",
+
+	[Key.ttsRead]: "朗讀",
+	[Key.ttsPause]: "暫停",
+	[Key.ttsResume]: "繼續",
+	[Key.ttsClose]: "關閉",
+	[Key.ttsSpeed]: "倍速",
+	[Key.ttsVoice]: "音色",
+	[Key.ttsPreparing]: "正在生成語音…",
+	[Key.ttsEmpty]: "沒有可朗讀的內容",
+	[Key.ttsFallback]: "朗讀服務無法使用，已切換系統語音",
+	[Key.ttsNoServer]: "未設定朗讀服務，使用系統語音",
 };

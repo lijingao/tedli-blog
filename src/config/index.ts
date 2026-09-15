@@ -60,3 +60,4 @@ export { sidebarLayoutConfig } from "./sidebarConfig"; // 侧边栏布局配置
 export { siteConfig } from "./siteConfig"; // 站点基础配置
 export { skillsConfig } from "./skillsConfig";
 export { sponsorConfig } from "./sponsorConfig"; // 赞助配置
+export { ttsConfig } from "./ttsConfig"; // 文章朗读（TTS）配置

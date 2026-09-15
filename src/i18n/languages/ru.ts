@@ -395,4 +395,15 @@ export const ru: Translation = {
 
 	[Key.welcomeCardLearnMore]: "Подробнее",
 	[Key.welcomeCardRecentLabel]: "Последние обновления",
+
+	[Key.ttsRead]: "Читать вслух",
+	[Key.ttsPause]: "Пауза",
+	[Key.ttsResume]: "Продолжить",
+	[Key.ttsClose]: "Закрыть",
+	[Key.ttsSpeed]: "Скорость",
+	[Key.ttsVoice]: "Голос",
+	[Key.ttsPreparing]: "Создание аудио…",
+	[Key.ttsEmpty]: "Нет текста для чтения",
+	[Key.ttsFallback]: "Сервис чтения недоступен, переключено на системный голос",
+	[Key.ttsNoServer]: "Сервис чтения не настроен, используется системный голос",
 };
