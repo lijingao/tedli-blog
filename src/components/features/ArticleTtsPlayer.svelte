@@ -25,14 +25,20 @@ let notice = $state("");
 
 let audio: HTMLAudioElement | null = null;
 let text = "";
-let speechQueue: string[] = [];
-let speechIndex = 0;
+let speechQueue = $state<string[]>([]);
+let speechIndex = $state(0);
 let speechEpoch = 0;
 let requestSeq = 0;
 let activeController: AbortController | null = null;
 let noticeTimer: ReturnType<typeof setTimeout> | null = null;
+let elapsedTimer: ReturnType<typeof setInterval> | null = null;
 
 const hasServer = ttsConfig.enable && ttsConfig.serverUrl.length > 0;
+const speechPercent = $derived(
+	speechQueue.length > 0
+		? Math.min(100, (speechIndex / speechQueue.length) * 100)
+		: 0,
+);
 
 onMount(() => {
 	const savedRate = Number(safeGetStorage("firefly-tts-rate") || "1");
@@ -91,9 +97,23 @@ function collectText(): string {
 
 function cancelSpeech(): void {
 	if (typeof window === "undefined") return;
+	stopElapsedTimer();
 	speechEpoch += 1;
 	window.speechSynthesis.cancel();
 	window.speechSynthesis.resume();
+}
+
+function startElapsedTimer(): void {
+	if (elapsedTimer) return;
+	elapsedTimer = setInterval(() => {
+		elapsed += 1;
+	}, 1000);
+}
+
+function stopElapsedTimer(): void {
+	if (!elapsedTimer) return;
+	clearInterval(elapsedTimer);
+	elapsedTimer = null;
 }
 
 function abortServerRequest(): void {
@@ -124,6 +144,7 @@ function stopAll(): void {
 	cancelSpeech();
 	invalidateRequest();
 	clearMediaSession();
+	stopElapsedTimer();
 	playing = false;
 	loading = false;
 	elapsed = 0;
@@ -168,7 +189,10 @@ function clearMediaSession(): void {
 
 function speakNext(epoch: number): void {
 	if (epoch !== speechEpoch || speechIndex >= speechQueue.length) {
-		if (epoch === speechEpoch) playing = false;
+		if (epoch === speechEpoch) {
+			playing = false;
+			stopElapsedTimer();
+		}
 		return;
 	}
 	const utterance = new SpeechSynthesisUtterance(speechQueue[speechIndex]);
@@ -183,6 +207,7 @@ function speakNext(epoch: number): void {
 		speakNext(epoch);
 	};
 	playing = true;
+	startElapsedTimer();
 	window.speechSynthesis.speak(utterance);
 }
 
@@ -192,6 +217,7 @@ function startSpeech(message: string): void {
 	invalidateRequest();
 	mode = "speech";
 	cancelSpeech();
+	elapsed = 0;
 	speechQueue = splitForSpeech(text);
 	speechIndex = 0;
 	if (speechQueue.length === 0) {
@@ -308,14 +334,13 @@ function toggle(): void {
 	}
 	if (mode === "speech") {
 		if (playing) {
-			window.speechSynthesis.pause();
+			cancelSpeech();
 			playing = false;
 		} else if (speechIndex >= speechQueue.length) {
 			speechIndex = 0;
 			speakNext(speechEpoch);
 		} else {
-			window.speechSynthesis.resume();
-			playing = true;
+			speakNext(speechEpoch);
 		}
 	}
 }
@@ -386,15 +411,15 @@ function close(): void {
 				class="tts-player__seek"
 				type="range"
 				min="0"
-				max={duration > 0 ? duration : 0}
+				max={mode === "speech" ? 100 : duration > 0 ? duration : 0}
 				step="0.5"
-				value={elapsed}
+				value={mode === "speech" ? speechPercent : elapsed}
 				oninput={seek}
 				aria-label={i18n(I18nKey.ttsRead)}
-				disabled={mode === "speech" || duration === 0}
+				disabled={mode === "server" ? duration === 0 : true}
 			/>
 			<span class="tts-player__time">
-				{formatTime(elapsed)} / {duration > 0 ? formatTime(duration) : "--:--"}
+				{formatTime(elapsed)} / {mode === "server" && duration > 0 ? formatTime(duration) : "--:--"}
 			</span>
 		</div>
 
