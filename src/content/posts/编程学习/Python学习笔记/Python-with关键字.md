@@ -3,7 +3,7 @@ title: Python with 关键字
 published: 2026-09-16
 tags:
   - Python
-description: "Python with 关键字的使用方法和上下文管理器"
+description: Python with 关键字的使用方法和上下文管理器
 ---
 在 Python 编程中，资源管理是一个重要但容易被忽视的环节。 `with` 关键字为我们提供了一种优雅的方式来处理文件操作、数据库连接等需要明确释放资源的场景。
 

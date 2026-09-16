@@ -3,7 +3,7 @@ title: Python3 迭代器与生成器
 published: 2026-09-16
 tags:
   - Python
-description: "Python3 迭代器、iter()、next() 和 yield 生成器"
+description: Python3 迭代器、iter()、next() 和 yield 生成器
 ---
 ## 迭代器
 
