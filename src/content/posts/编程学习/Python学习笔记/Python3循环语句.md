@@ -3,7 +3,7 @@ title: Python3 循环语句
 published: 2026-09-15
 tags:
   - Python
-description: "Python3 while、for 循环、break、continue 和 range() 函数"
+description: Python3 while、for 循环、break、continue 和 range() 函数
 ---
 本章节将为大家介绍 Python 循环语句的使用。
 
@@ -612,10 +612,12 @@ Good bye!
 
 ## 练习题
 
-- [ ] **1. while 循环基础**
+- [x] **1. while 循环基础**
   创建文件 `test_while.py`，完成以下操作：
-  - 用 while 循环打印 1 到 10 的数字 |---知识点：while 条件:---|
-  - 每个数字换行输出 |---知识点：print(数字)---|
+  - 用 while 循环打印 1 到 10 的数字
+  - 每个数字换行输出
+
+  **知识点：** while 条件:、print(数字)
 
   **参考答案：**
   ```python
@@ -625,10 +627,12 @@ Good bye!
       i += 1
   ```
 
-- [ ] **2. for 循环遍历**
+- [x] **2. for 循环遍历**
   创建文件 `test_for.py`，完成以下操作：
-  - 用 for 循环遍历列表 `["苹果", "香蕉", "橘子", "葡萄"]` |---知识点：for 变量 in 序列:---|
-  - 打印每个元素 |---知识点：print(变量)---|
+  - 用 for 循环遍历列表 `["苹果", "香蕉", "橘子", "葡萄"]`
+  - 打印每个元素
+
+  **知识点：** for 变量 in 序列:
 
   **参考答案：**
   ```python
@@ -637,11 +641,13 @@ Good bye!
       print(fruit)
   ```
 
-- [ ] **3. range() 函数**
+- [x] **3. range() 函数**
   创建文件 `test_range.py`，完成以下操作：
-  - 用 range(1, 11) 打印 1 到 10 |---知识点：range(开始, 结束)---|
-  - 用 range(0, 10, 2) 打印 0 到 10 的偶数 |---知识点：range(开始, 结束, 步长)---|
-  - 用 range(10, 0, -1) 倒序打印 10 到 1 |---知识点：range(开始, 结束, 负步长)---|
+  - 用 range(1, 11) 打印 1 到 10
+  - 用 range(0, 10, 2) 打印 0 到 10 的偶数
+  - 用 range(10, 0, -1) 倒序打印 10 到 1
+
+  **知识点：** range(开始, 结束, 步长)
 
   **参考答案：**
   ```python
@@ -661,11 +667,13 @@ Good bye!
   print()
   ```
 
-- [ ] **4. break 跳出循环**
+- [x] **4. break 跳出循环**
   创建文件 `test_break.py`，完成以下操作：
-  - 用 while 循环，从 1 开始累加 |---知识点：while True:---|
-  - 当总和超过 100 时，用 break 跳出循环 |---知识点：if 条件: break---|
-  - 打印最后加的数字和总和 |---知识点：print(结果)---|
+  - 用 while 循环，从 1 开始累加
+  - 当总和超过 100 时，用 break 跳出循环
+  - 打印最后加的数字和总和
+
+  **知识点：** while True:、break
 
   **参考答案：**
   ```python
@@ -680,10 +688,12 @@ Good bye!
   print(f"总和: {total}")
   ```
 
-- [ ] **5. continue 跳过本次**
+- [x] **5. continue 跳过本次**
   创建文件 `test_continue.py`，完成以下操作：
-  - 用 for 循环打印 1 到 10 |---知识点：for i in range(1, 11):---|
-  - 如果数字是 5，用 continue 跳过不打印 |---知识点：if i == 5: continue---|
+  - 用 for 循环打印 1 到 10
+  - 如果数字是 5，用 continue 跳过不打印
+
+  **知识点：** continue（跳过本次循环）
 
   **参考答案：**
   ```python
@@ -694,11 +704,13 @@ Good bye!
   print()
   ```
 
-- [ ] **6. for...else 语句**
+- [x] **6. for...else 语句**
   创建文件 `test_for_else.py`，完成以下操作：
-  - 在列表 `[1, 3, 5, 7, 9]` 中查找数字 6 |---知识点：for num in nums:---|
-  - 如果找到，打印"找到了" |---知识点：if num == 6: print("找到了"); break---|
-  - 如果没找到（循环正常结束），打印"没找到" |---知识点：else: print("没找到")---|
+  - 在列表 `[1, 3, 5, 7, 9]` 中查找数字 6
+  - 如果找到，打印"找到了"
+  - 如果没找到（循环正常结束），打印"没找到"
+
+  **知识点：** for...else:（循环没被break中断时执行else）
 
   **参考答案：**
   ```python
@@ -711,10 +723,12 @@ Good bye!
       print("没找到")
   ```
 
-- [ ] **7. 嵌套循环**
+- [x] **7. 嵌套循环**
   创建文件 `test_nested.py`，完成以下操作：
-  - 用嵌套 for 循环打印乘法表（1-5） |---知识点：for i in range(1, 6):---|
-  - 输出格式：`1x1=1`、`1x2=2`...`5x5=25` |---知识点：for j in range(1, 6): print(f"{i}x{j}={i*j}")---|
+  - 用嵌套 for 循环打印乘法表（1-5）
+  - 输出格式：`1x1=1`、`1x2=2`...`5x5=25`
+
+  **知识点：** for i in range(1, 6):、for j in range(1, 6):
 
   **参考答案：**
   ```python
