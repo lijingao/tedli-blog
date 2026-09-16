@@ -9,8 +9,6 @@ import IncomeCategoryCard from "@/components/bills/IncomeCategoryCard.astro";
 import MonthlyFlowCard from "@/components/bills/MonthlyFlowCard.astro";
 import MonthlySummaryCard from "@/components/bills/MonthlySummaryCard.astro";
 import YearlyFlowCard from "@/components/bills/YearlyFlowCard.astro";
-import EncryptGate from "@/components/security/EncryptGate.astro";
-import PasswordGate from "@/components/security/PasswordGate.svelte";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import {
 	categoryExpenseRank,
@@ -164,8 +162,7 @@ const incomeTotalCount = incomeList.reduce((s, r) => s + r.count, 0);
 const incomeTotalAmt = incomeList.reduce((s, r) => s + r.amount, 0);
 ---
 <MainGridLayout title="账单" description="账单仪表盘">
-  <EncryptGate gateId="bills">
-    <div class="bills-page">
+  <div class="bills-page" data-pagefind-body>
     <div class="bills-grid">
       <div class="bills-col">
         <div class="order-net"><BalanceCard income={yearStats.income} expense={yearStats.expense} balance={yearBalance} /></div>
@@ -194,8 +191,6 @@ const incomeTotalAmt = incomeList.reduce((s, r) => s + r.amount, 0);
       <button class="bills-custom-btn" type="button">+ 自定义首页</button>
     </div>
   </div>
-  </EncryptGate>
-  <PasswordGate client:load gateId="bills" />
 </MainGridLayout>
 
 <style>

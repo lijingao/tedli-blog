@@ -21,7 +21,7 @@ import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
-import { expressiveCodeConfig, securityConfig, siteConfig } from "./src/config";
+import { expressiveCodeConfig, siteConfig } from "./src/config";
 import I18nKey from "./src/i18n/i18nKey";
 import { i18n } from "./src/i18n/translation";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
@@ -165,13 +165,6 @@ export default defineConfig({
 				}
 				if (pathname === "/bangumi/" && !siteConfig.pages.bangumi) {
 					return false;
-				}
-
-				// 页面加密启用时不收录加密页面（资金/账单、笔记本、日程）
-				if (securityConfig.enabled) {
-					if (pathname.startsWith("/bills")) return false;
-					if (pathname.startsWith("/life/notebooks")) return false;
-					if (pathname.startsWith("/schedules")) return false;
 				}
 
 				return true;

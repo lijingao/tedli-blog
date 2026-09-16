@@ -4,8 +4,6 @@ import * as path from "node:path";
 import type { ImageMetadata } from "astro";
 import { Icon } from "astro-icon/components";
 import NotebookCommentModal from "@/components/comment/NotebookCommentModal.svelte";
-import EncryptGate from "@/components/security/EncryptGate.astro";
-import PasswordGate from "@/components/security/PasswordGate.svelte";
 import { profileConfig } from "@/config";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 
@@ -209,8 +207,7 @@ const recentNotes: RecentNote[] = allNotes
 <MainGridLayout title="笔记本" description="成长日记、学习复盘、灵感随笔">
 	<div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
 		<div class="card-base z-10 px-4 py-6 md:px-9 relative w-full">
-		<div class="diary-page flex w-full flex-col gap-4">
-			<EncryptGate gateId="notebooks">
+		<div class="diary-page flex w-full flex-col gap-4" data-pagefind-body>
 			<!-- 顶部：图标 + 标题 + 统计 -->
 			<div class="diary-header">
 				<div class="mb-6">
@@ -374,9 +371,7 @@ const recentNotes: RecentNote[] = allNotes
 					))}
 				</div>
 			</section>
-		)}
-
-			</EncryptGate>
+			)}
 
 		<!-- 评论区：复用动态同款弹窗（/moments/ 通道，支持引用/回复/图床/表情） -->
 		<NotebookCommentModal client:load />
@@ -427,7 +422,6 @@ const recentNotes: RecentNote[] = allNotes
 	</div>
 	</div>
 	</div>
-	<PasswordGate client:load gateId="notebooks" />
 	</MainGridLayout>
 
 	<style>

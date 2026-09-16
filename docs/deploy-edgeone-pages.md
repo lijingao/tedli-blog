@@ -54,9 +54,9 @@ EdgeOne Pages 托管（blog.tsh520.cn 直接绑定 Pages 项目）
 | `PUBLIC_IMAGEBED_AUTH_CODE` | 图床上传鉴权码 |
 | `PUBLIC_IMAGEBED_FOLDER` | 图床上传目录 |
 | `PUBLIC_IMAGEBED_API_TOKEN` | 图床 API Token |
-| `GATE_PASSWORD` | 加密页（/bills/、/life/notebooks/、/schedules/）的 AES 密钥，非 PUBLIC_ 前缀不会进客户端 |
+| `PUBLIC_TTS_SERVER` | 文章朗读 TTS 服务地址，留空降级浏览器系统语音 |
 
-> 缺失任何变量构建仍会成功，但对应功能静默降级（评论无后端、统计空白、加密页无法解锁），务必逐项核对。
+> 缺失任何变量构建仍会成功，但对应功能静默降级（评论无后端、统计空白），务必逐项核对。
 
 ### 4. 首次构建与预览验证
 
@@ -64,7 +64,7 @@ EdgeOne Pages 托管（blog.tsh520.cn 直接绑定 Pages 项目）
 
 - 首页渲染、Swup 导航、主题切换
 - 文章页、分类页、归档页
-- 加密页 `/bills/` `/life/notebooks/` `/schedules/`（密码门能解锁）
+- 账单 `/bills/`、笔记本 `/life/notebooks/`、日程 `/schedules/`（内容直接展示）
 - `/search/`（pagefind）、`sitemap.xml`、`robots.txt`、RSS
 - 评论 / 首页统计 / 音乐 / 相册 / 朋友圈 /circle/ / 友链状态徽标
 - 404 页、`trailingSlash` 尾斜杠路由
@@ -98,5 +98,5 @@ EdgeOne Pages 托管（blog.tsh520.cn 直接绑定 Pages 项目）
 | 问题 | 排查 |
 |---|---|
 | 构建失败 | 先看 Node 版本是否 ≥ 22、pnpm 是否 9.14.x、构建命令是否为 `pnpm build`；与 `build.yml` 的 CI 行为对照 |
-| 功能静默缺失（评论/统计/加密页打不开） | 检查 13 个环境变量是否逐项填齐（见第二节表） |
+| 功能静默缺失（评论/统计空白） | 检查 13 个环境变量是否逐项填齐（见第二节表） |
 | 需要换域名 | 改 `src/config/siteConfig.ts:16` 的 `site_url`（sitemap/robots/RSS/canonical 自动跟随）+ 控制台重新绑定域名；注意 `src/config/musicConfig.ts` 等硬编码的 `*.tsh520.cn` 子域不受影响 |

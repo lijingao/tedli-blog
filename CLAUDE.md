@@ -48,7 +48,7 @@
 ```
 src/
 ├── assets/images/       # 头像、封面等构建时图片
-├── components/          # 按功能域组织的组件（149 个文件）
+├── components/          # 按功能域组织的组件（147 个文件）
 │   ├── analytics/       # GA, Clarity, Umami (3)
 │   ├── comment/         # 评论系统：index + 5 种后端 + 3 个弹窗组件 + NotebookComment 笔记本列表页自研评论区（笔记引用 >>QUOTE>> 编码 + Waline 树形回复 pid/rid/at + 表情 :item: 标记，昵称/邮箱必填） (10)
 │   ├── common/          # 跨域共享基础组件 (17)
@@ -59,10 +59,9 @@ src/
 │   ├── moments/         # 动态卡片与评论弹窗
 │   ├── bills/         # 账单/资金（7：Balance 年度结余横幅卡 + MonthlyFlow 月度流水（按日分组/月份筛选/分页）+ BillCalendar 账单日历（农历+每日收支）+ DailyTrend/ExpenseRank/IncomeCategory/MonthlySummary/YearlyFlow，按图两栏等比缩小）
 │   ├── schedules/     # 日程（3：ScheduleCalendar/ScheduleList/SchedulesView 周视图默认 + 提醒 + 分页等高）
-│   ├── security/        # 页面加密（2：EncryptGate.astro 构建时 AES 加密壳 + PasswordGate.svelte 毛玻璃密码门）
 │   ├── pages/           # 页面级组件：bangumi, books（Bookshelf/BookCard：3D 书本卡片 + 影视页同款胶囊筛选（分类+读过/在读/想读）+ ClientPagination 分页 8/6 本每页，SSR 隐藏非首页防闪烁）, movies-games, music (10)
 │   └── widget/          # 侧栏 Widget (27)
-├── config/              # 站点配置（28 个 .ts，index.ts barrel export）
+├── config/              # 站点配置（27 个 .ts，index.ts barrel export）
 ├── constants/           # 常量：页面尺寸、主题模式、图标、链接预设
 ├── content/             # Astro Content Collections（15 个集合：posts/spec/moments/bangumi/life/notebooks/album/daohang/ziyuan/friends/apps/tombstones/changelog/bills/schedules）
 │   ├── album/ apps/ bangumi/ changelog/ daohang/
@@ -79,7 +78,7 @@ src/
 │       guestbook, life/notebooks, movies-games/, music, projects, search,
 │       sponsor, rss, robots.txt, og
 ├── plugins/             # 自定义 remark/rehype 插件 (10)
-├── styles/              # CSS 样式（72 个文件，含 about 技术栈/时间线/更新日志图谱）
+├── styles/              # CSS 样式（73 个文件，含 about 技术栈/时间线/更新日志图谱）
 │   ├── tokens/          # 设计令牌：colors, breakpoints, animation, z-index
 │   ├── base/            # reset, utilities
 │   ├── components/      # 组件样式
@@ -89,9 +88,9 @@ src/
 │   ├── transitions/     # Swup 过渡动画
 │   └── vendor/          # 第三方覆盖
 ├── types/               # TypeScript 类型：config.ts, bangumi.ts, guestbook-chat.ts
-└── utils/               # 工具函数（42 个文件，含 changelog.ts / tag-graph 控制器 / tts-text 正文提取等）
+└── utils/               # 工具函数（41 个文件，含 changelog.ts / tag-graph 控制器 / tts-text 正文提取等）
     ├── 8 个控制器模块   # 见第 10 节
-    └── 34 个业务工具    # content-utils, category-tree（文件夹即分类，多级 `a/b` 推导 + CategoryNode 树）, date-utils, image-utils, url-utils, tts-text（朗读正文提取）...
+    └── 33 个业务工具    # content-utils, category-tree（文件夹即分类，多级 `a/b` 推导 + CategoryNode 树）, date-utils, image-utils, url-utils, tts-text（朗读正文提取）...
 
 # 根目录其他重要文件
 .pages.yml                # PagesCMS 后台配置（11 集合声明，见第 19 节）
@@ -162,9 +161,9 @@ Layout.astro          ← HTML 骨架：<html>, <head>, <body>, 全局组件, �
 - Hue 可配置（`siteConfig.themeColor.hue`），映射到 oklch 的 H 参数
 - 切换主题时使用 View Transition API 保护动画
 
-### 3.4 页面加密（EncryptGate / PasswordGate，2026-08-30 新增）
+### 3.4 页面加密（已移除，2026-09-16）
 
-`/bills/`（资金/账单）、`/life/notebooks/`（列表+详情）与 `/schedules/`（日程，含 client:Svelte 的 SchedulesView island——island 占位连 props 一起被加密，注入后 astro-island upgrade 自动水合）的内容在构建时用 PBKDF2(250k)+AES-256-GCM 加密成密文内联，输密码后浏览器解密注入。**密钥链路**：`GATE_PASSWORD`（构建环境变量，本地 `.env` + GitHub Secrets，非 PUBLIC_ 前缀不进客户端）→ `EncryptGate.astro` 构建时加密 slot HTML（`Astro.slots.render("default")`）→ 页面内 `<template data-gate-template>` 存密文 → `PasswordGate.svelte`（client:load，必须在 MainGridLayout slot 即 Swup 容器内）读密文 → WebCrypto 解密 → `innerHTML` 注入并同步派发 `swup:content:replaced` 让翻页/展开等内联脚本重扫。**统一密码共享 salt**（`GATE_SALT_SEED` 常量派生），任意加密页输一次密码后其余页与 7 天内重开浏览器（localStorage 存派生密钥）均免输。开关与文案在 `src/config/securityConfig.ts`（enabled=false 可整体关闭）。模板内容要读 `template.content.textContent`（template.textContent 可能为空）。泄露面封堵清单（改加密范围时同步检查）：`content-utils.ts#getArchiveList`（归档跳过 notebooks）、`astro.config.mjs` sitemap filter、`pagefind.yml` exclude_globs、`widget/RecentItems.astro` 与 `widget/LifeStats.astro`（加密开启时不展示笔记本）。**密码丢失无法恢复**。
+`/bills/`、`/life/notebooks/`（列表+详情）、`/schedules/` 曾在构建时用 PBKDF2(250k)+AES-256-GCM 把敏感 HTML 加密成密文内联（EncryptGate / PasswordGate 毛玻璃密码门，密钥来自 `GATE_PASSWORD`）。**该功能已按站长要求彻底移除**：三个页面恢复明文直出，sitemap、pagefind 站内搜索、归档时间线（`content-utils.ts#getArchiveList`）与侧栏（`widget/RecentItems.astro`、`widget/LifeStats.astro`）重新收录/展示笔记本。如需恢复，见 git 历史中的 `src/components/security/`、`src/utils/encrypt-gate.ts`、`src/config/securityConfig.ts`、`src/styles/pages/encrypt-gate.css`，以及 changelog `2026-08-30-encrypt-gate.md`。
 
 ### 3.5 Content Collections
 
@@ -305,7 +304,7 @@ Layout.astro          ← HTML 骨架：<html>, <head>, <body>, 全局组件, �
 
 ## 6. 配置系统
 
-28 个配置文件，通过 `src/config/index.ts` barrel export（30 个具名导出）。
+27 个配置文件，通过 `src/config/index.ts` barrel export（29 个具名导出）。
 
 ### 核心配置
 
@@ -323,7 +322,7 @@ Layout.astro          ← HTML 骨架：<html>, <head>, <body>, 全局组件, �
 
 ### 其他配置
 
-`adConfig`, `announcementConfig`, `circleConfig`, `coverImageConfig`, `expressiveCodeConfig`, `fontConfig`, `footerConfig`, `friendsConfig`, `guestbookConfig`, `licenseConfig`, `momentConfig`(动态评论配置), `pioConfig`(Live2D/Spine), `relationshipConfig`, `sakuraConfig`, `securityConfig`, `skillsConfig`, `sponsorConfig`, `ttsConfig`(文章朗读)
+`adConfig`, `announcementConfig`, `circleConfig`, `coverImageConfig`, `expressiveCodeConfig`, `fontConfig`, `footerConfig`, `friendsConfig`, `guestbookConfig`, `licenseConfig`, `momentConfig`(动态评论配置), `pioConfig`(Live2D/Spine), `relationshipConfig`, `sakuraConfig`, `skillsConfig`, `sponsorConfig`, `ttsConfig`(文章朗读)
 
 ### 外部配置（直接导入，不经 barrel）
 
@@ -651,8 +650,6 @@ return controller;
 | CI 中 Biome 用 `version: latest` 或版本与 package.json 不一致 | 规则漂移导致"本地绿 CI 红"（2026-08 实测：2.3 vs 2.5 的 useAltText 升级为 error） | setup-biome action 不指定 version，自动读取 package.json 版本 |
 | 手写 `frontmatter.category` 或用 Obsidian 插件再写 category | 2026-08-20 后分类已改为文件夹即分类（`category-tree.ts`），frontmatter 再写会被忽略且 `.pages.yml` 未声明字段保存时丢弃 | 分类只靠 `src/content/posts/父/子/xxx.md` 建文件夹，勿写 frontmatter |
 | 修改博客各功能 frontmatter 字段（`src/content.config.ts` 的 zod schema / `.pages.yml` / 页面 `normalizeImages`/`getGridCols` 等展示逻辑）未同步 AstrBot 插件 `plug-in/AstrBot/AstrBot BlogWriter` 的 `build_*_md` 生成逻辑 | 插件写入的旧格式导致页面 `images` 为空、归档卡片/灯箱不显示或 zod 校验失败（如 2026-09-27 笔记从正文 `![](url)` 改为 `images` 数组，前端已用 `images` 宫格展示） | 凡改动 moments/bangumi/life/notebooks/album/daohang/bills/schedules 等集合的字段名、类型或渲染约定，必须立即检查并同步更新插件的 `blog_writer_core.py:build_*_md` 与 `tests/test_core.py`，并提醒站长同步发布插件新版本 |
-| 把敏感内容/交互组件移出 `EncryptGate` 加密区，或把 `PasswordGate` 放到 `MainGridLayout` 外 | 内容明文出现在 HTML（加密失效）；PasswordGate 在 Swup 容器外时 SPA 导航进入加密页不重新挂载，门与解密注入全失效（2026-08-30 实测教训） | 加密页敏感内容必须包在 `<EncryptGate gateId>` 内且不含 client:Svelte 组件（is:inline 脚本放加密区外靠事件委托）；PasswordGate 必须放 `</MainGridLayout>` 之前（Swup 容器内） | 见 §3.4 |
-| 解密注入后未派发 `swup:content:replaced` | 加密区内的账单翻页、笔记本展开收起、评论按钮等依赖该事件重扫的内联脚本全部失灵 | `PasswordGate.svelte` 的 `finishUnlock()` 已同步派发，勿删 | 见 §3.4 |
 | 把 API Key / Token / 密码硬编码进任何被 git 跟踪的文件（scripts/、注释、markdown 都算），或轻信注释里"会被 .gitignore 保护"的声明而不实测 | 公开仓库全历史可读，GitGuardian 告警、密钥被扫描器批量收割滥用（2026-08-30 GitGuardian 事故：DashScope Key 硬编码在 `scripts/生成摘要/index.ts` 长期公开，声明受 .gitignore 保护但实际从未生效） | 密钥一律放 `.env`（已 gitignore）+ `process.env.XXX` 读取，脚本调用带 `--env-file=.env`，`.env.example` 只留空模板；新增任何疑似含密钥的文件，提交前必须实测 `git check-ignore <path>` 与 `git ls-files <path>` 确认未被跟踪；一旦泄露：**先去对应控制台吊销重发（唯一根治）**，再从代码清除，git 历史清理通常不必要且代价大 |
 | 用文件 mtime 做集合排序/展示的兜底依据 | CI（EdgeOne/GitHub Actions）每次全新 clone，所有文件 mtime 都等于构建时刻、比任何业务日期都新——缺字段的旧条目会永远霸占"最新"区块（2026-09 友链页"新朋友"事故） | 排序只认 frontmatter 业务字段（如 friends 的 `added`）；字段缺失时构建期 `console.warn` 并让条目落到最后 |
 | 拿 Astro content 集合的 `item.id` 拼磁盘路径 / 匹配 public 静态文件 | id 是 github-slugger 规则（小写 + 移除标点、空格转连字符），与磁盘文件名不一致（`39-胡超，作品集.md` → id `39-胡超作品集`、`33-RAGNote.md` → `33-ragnote`），Linux CI 大小写敏感必失配 | 文件名 ↔ id 换算必须走同一 slug 规则（截图脚本 `scripts/友链截图/index.mjs` 已内置 github-slugger）；新增含大写/标点文件名的友链后核对 `public/assets/friends-shots/` 截图命名 |
@@ -728,7 +725,7 @@ Vercel（PagesCMS 实例，绑定 cms-origin.tsh520.cn）
     ↓ GitHub API 写回
 仓库 main 分支（内容文件）
     ↓ GitHub Webhook
-EdgeOne Pages（GitHub 集成自动构建：pnpm build → dist/，需配 14 个构建环境变量）
+EdgeOne Pages（GitHub 集成自动构建：pnpm build → dist/，需配 13 个构建环境变量）
     ↓
 博客站点（EdgeOne Pages 托管，https://blog.tsh520.cn）
 ```
@@ -737,7 +734,7 @@ EdgeOne Pages（GitHub 集成自动构建：pnpm build → dist/，需配 14 个
 - **配置声明**：仓库根目录 `.pages.yml` 声明 12 个内容集合（posts 按分类拆 13 个集合、moments/friends/apps/daohang/album/ziyuan 拆 2/life 拆 3、tombstones 2026-08 新增），字段与 `src/content.config.ts` 的 zod 对齐
 - **自定义字段**：imgbed（图床上传，走服务端代理）+ amap-geocode（高德坐标，保存时展开为 lat/lng）——在 pagescms 仓库（`E:\GithubProgect\MyRunProject\pagescms`）的 `fields/custom/` 定义，注册在 `fields/registry.ts`
 - **凭证**：Vercel 环境变量（GITHUB_APP_*、IMAGEBED_*、AMAP_KEY 等）；图床/高德代理路由在 pagescms 的 `app/api/` 下（凭证服务端持有）
-- **朗读服务**：EdgeOne Pages 构建环境变量新增 `PUBLIC_TTS_SERVER`（第 14 个，指向自建 edge-tts 服务，部署见 `docs/deploy-edge-tts.md`）；留空时文章朗读自动降级浏览器系统语音
+- **朗读服务**：EdgeOne Pages 构建环境变量新增 `PUBLIC_TTS_SERVER`（第 13 个，指向自建 edge-tts 服务，部署见 `docs/deploy-edge-tts.md`）；留空时文章朗读自动降级浏览器系统语音
 - **修改 .pages.yml 后**：字段必须与 zod 对齐（merge: false，未声明字段保存时被丢弃）；校验脚本已随 Decap 遗留一并删除——**当前 .pages.yml 的字段对齐靠手动检查 + 构建验证**
 
 > ⚠️ 曾使用 Decap CMS（public/admin/ 目录 + config.yml）；该遗留已随 `validate-sveltia-config.mjs` 等脚本于 2026-08 删除，现统一用 PagesCMS。
